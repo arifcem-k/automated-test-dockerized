@@ -6,7 +6,7 @@ Bu proje, **ParaBank** simülasyon platformu üzerinde uçtan uca (E2E) iş sür
 
 ---
 
-## 🛠️ Kullanılan Teknolojiler & Kütüphaneler
+## Kullanılan Teknolojiler & Kütüphaneler
 * **Programlama Dili:** Java 17
 * **Test Otomasyon Aracı:** Selenium WebDriver (v4.x - Otomatik Driver Yönetimi)
 * **Test Framework:** TestNG (Assertion & Test Yönetimi)
