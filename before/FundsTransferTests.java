@@ -22,7 +22,6 @@ public class FundsTransferTests {
 
         driver.manage().window().maximize();
     }
-
     @Test
     public void hesaplarArasiParaTransferTesti() {
         driver.get("https://parabank.parasoft.com/");
@@ -30,9 +29,11 @@ public class FundsTransferTests {
         driver.findElement(By.name("password")).sendKeys("Test1234");
         driver.findElement(By.xpath("//input[@value='Log In']")).click();
 
-
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Transfer Funds"))).click();
+
+
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//select[@id='fromAccountId']/option[1]")));
 
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("amount"))).sendKeys("100");
@@ -41,9 +42,16 @@ public class FundsTransferTests {
         driver.findElement(By.xpath("//input[@value='Transfer']")).click();
 
 
-        WebElement basariElementi = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("title")));
-        Assert.assertTrue(basariElementi.getText().contains("Transfer Complete"), "Transfer tamamlanma mesajı alınamadı!");
+        WebElement basariElementi = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='showResult']/h1"))
+        );
+
+
+        String basariMetni = basariElementi.getText().trim();
+        Assert.assertTrue(basariMetni.contains("Transfer Complete"),
+                "Ekranda beklenen başarı mesajı görülemedi! Alınan metin: " + basariMetni);
     }
+
 
     @Test
     public void yetersizBakiyeTransferHataTesti() {
@@ -67,7 +75,9 @@ public class FundsTransferTests {
     }
     @AfterMethod
     public void tearDown() {
-
+        if (driver != null) {
+            driver.quit();
+        }
 
     }
 }
