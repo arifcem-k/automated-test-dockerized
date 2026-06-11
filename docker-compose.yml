@@ -1,0 +1,38 @@
+services:
+  # 1. Trafiği yönetecek Selenium Hub
+  selenium-hub:
+    image: selenium/hub:4.10.0
+    container_name: selenium-hub
+    ports:
+      - "4444:4444"
+    # Hub'ın tamamen hazır olup olmadığını denetleyen sağlık kontrolü
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444/status"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+
+  # 2. Testlerin içinde fiilen koşacağı Chrome Node
+  chrome-node:
+    image: selenium/node-chrome:4.10.0
+    container_name: chrome-node
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+
+  # 3. POM Mimarili Test Projeniz
+  test-execution:
+    build: .
+    container_name: test-runner
+    depends_on:
+      selenium-hub:
+        condition: service_healthy # Hub tamamen ayağa kalkıp "sağlıklı" raporu verene kadar BEKLE
+      chrome-node:
+        condition: service_started
+    environment:
+      - SELENIUM_REMOTE_URL=http://selenium-hub:4444/wd/hub
+    # Komut tam olarak bu şekilde olmalı:
+    command: mvn clean test
